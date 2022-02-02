@@ -28,38 +28,38 @@ def build_pattern(col_filter, keywords)
 end
 
 def match(string, key, match_mode)
-    match = FALSE
+    match = false
     if string.nil?
-        match = FALSE
+        match = false
     elsif  match_mode == 'i'
         match = string.include?(key)
     elsif match_mode == 'c'
         if string == key
-            match = TRUE
+            match = true
         end
     end
     return match
 end
 
-def filter(header, pattern, search_mode, match_mode, reverse = FALSE)
-    filter = FALSE
+def filter(header, pattern, search_mode, match_mode, reverse = false)
+    filter = false
     pattern.each do |col,keys|
-        match = FALSE
+        match = false
         keys.each do |key|
             if match(header[col], key, match_mode)
-                match =TRUE
+                match =true
             end
         end
         if match
             if search_mode == 's'
-                filter = FALSE
+                filter = false
                 break
             end
         elsif !match && search_mode == 'c'
-            filter = TRUE
+            filter = true
             break
         elsif !match
-            filter = TRUE
+            filter = true
         end
     end
     if reverse
@@ -152,14 +152,14 @@ optparse = OptionParser.new do |opts|
                 options[:separator] = separator
         end
 
-        options[:reverse] = FALSE
+        options[:reverse] = false
         opts.on( '-r', '--reverse', 'Select not matching' ) do 
-                options[:reverse] = TRUE
+                options[:reverse] = true
         end
 
-        options[:uniq] = FALSE
+        options[:uniq] = false
         opts.on( '-u', '--uniq', 'Delete redundant items' ) do 
-                options[:uniq] = TRUE
+                options[:uniq] = true
         end
 
         # Set a banner, displayed at the top of the help screen.
