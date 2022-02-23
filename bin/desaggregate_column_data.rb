@@ -18,7 +18,7 @@ OptionParser.new do |opts|
 
   options[:sep] = ","
   opts.on("-s", "--sep_char STRING", "Field character delimiter") do |item|
-    options[:sep] = item.to_i
+    options[:sep] = item
   end
 
   opts.on_tail("-h", "--help", "Show this message") do
