@@ -25,6 +25,17 @@ OptionParser.new do |opts|
 	opts.on("-c", "--columns STRING", "Columns indexes, comma separated, to perform the ID translations.") do |item|
 		options[:columns] = item.split(','). map{|i| i.to_i - 1}
 	end
+
+	options[:from] = 0
+	opts.on("-f", "--from INTEGER", "Column in index file to take reference value. Default 1. Numeration is 1 based") do |item|
+		options[:from] = item.to_i - 1
+	end
+
+	options[:to] = 1
+	opts.on("-t", "--to INTEGER", "Column in index file to take the value that will be used in substitution. Default 2. Numeration is 1 based") do |item|
+		options[:to] = item.to_i - 1
+	end
+
 end.parse!
 
 #Load index
@@ -32,7 +43,7 @@ index = {}
 File.open(options[:index_file]).read.each_line do |line|
 	line.chomp!
 	fields = line.split("\t")
-	index[fields[0]] = fields[1]
+	index[fields[options[:from]]] = fields[options[:to]]
 end
 
 #Reemplaza nombres
