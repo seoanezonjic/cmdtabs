@@ -9,7 +9,12 @@ require 'optparse'
 def load_records(file, cols, sep, full)
 	recs = {}
   full_recs = {}
-	File.open(file).each do |line|
+  if file == '-'
+    input = STDIN
+  else
+	  input = File.open(file)
+  end
+  input.each do |line|
 		fields = line.chomp.split(sep)
     values = cols.map{|c| fields[c]}
 		recs[values] = true
