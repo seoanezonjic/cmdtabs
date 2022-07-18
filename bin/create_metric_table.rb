@@ -43,8 +43,9 @@ def create_table (indexed_metrics, samples_tag, attributes, metric_names)
 	 		table_output << record
 	 	end
 	end
-	table_output.unshift(allTags.unshift(samples_tag)) # Add header
-	corrupted_records.unshift(allTags.unshift(samples_tag)) # Add header
+	allTags.unshift(samples_tag)
+	table_output.unshift(allTags) # Add header
+	corrupted_records.unshift(allTags) # Add header
 	return table_output, corrupted_records
 end
 
