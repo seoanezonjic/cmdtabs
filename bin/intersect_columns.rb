@@ -6,13 +6,21 @@ require 'optparse'
 ## METHODS
 ######################################################################
 
-def load_records(file, cols, sep)
+def load_records(file, cols, sep, full)
 	recs = {}
-	File.open(file).each do |line|
+  full_recs = {}
+  if file == '-'
+    input = STDIN
+  else
+	  input = File.open(file)
+  end
+  input.each do |line|
 		fields = line.chomp.split(sep)
-		recs[cols.map{|c| fields[c]}] = true
+    values = cols.map{|c| fields[c]}
+		recs[values] = true
+    full_recs[values] = fields if full
 	end
-	return recs.keys
+	return recs.keys, full_recs
 end
 
 def print_recs(recs, sep)
@@ -59,6 +67,11 @@ OptionParser.new do |opts|
     options[:keep] = item
   end
 
+  options[:full] = false
+  opts.on("--full", "Give full record") do |item|
+    options[:full] = true
+  end
+
   options[:sep] = "\t"
   opts.on("-s", "--separator STRING", "column character separator") do |item|
     options[:sep] = item
@@ -70,8 +83,8 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-a_records = load_records(options[:a_file], options[:a_cols], options[:sep])
-b_records = load_records(options[:b_file], options[:b_cols], options[:sep])
+a_records, full_a_rec = load_records(options[:a_file], options[:a_cols], options[:sep], options[:full])
+b_records, full_b_rec = load_records(options[:b_file], options[:b_cols], options[:sep], options[:full])
 
 common = a_records & b_records
 a_only = a_records - common
@@ -82,12 +95,19 @@ if options[:count]
 	puts "c: #{common.length}"
 else
 	if options[:keep] == 'c'
+    common = common.map{|r| full_a_rec[r] + full_b_rec[r]} if options[:full]
 		print_recs(common, options[:sep])
 	elsif options[:keep] == 'a'
+    a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
 		print_recs(a_only, options[:sep])
 	elsif options[:keep] == 'b'
+    b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
 		print_recs(b_only, options[:sep])
 	elsif options[:keep] == 'ab'
+    if options[:full]
+      a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
+      b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
+    end
 		print_recs(a_only + b_only, options[:sep])
 	end
 end
