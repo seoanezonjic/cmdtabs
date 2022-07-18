@@ -3,22 +3,20 @@
 #####################################################################
 ## METHODS
 ######################################################################
-def index_metrics(input_data, samples_tag, attributes)
+def index_metrics(input_data, attributes)
+	n_attrib = attributes.length
 	indexed_metrics = {}
 	metric_names = []
-	n_attrib = attributes.length
 	input_data.each do |entry|
-		samples_tag = entry.shift
+		sample_id = entry.shift
 		sample_attributes = entry[0..n_attrib - 1]
-		metric = entry[n_attrib..n_attrib + 1]
-		metric_name = metric.shift
-		metric = metric.shift
+		metric_name, metric = entry[n_attrib..n_attrib + 1]
 		metric_names << metric_name if !metric_names.include?(metric_name)
-		query = indexed_metrics[samples_tag]
+		query = indexed_metrics[sample_id]
 		if query.nil?
-			indexed_metrics[samples_tag] = {metric_name => metric}
+			indexed_metrics[sample_id] = {metric_name => metric}
 			attributes.each_with_index do |attrib, i|
-				indexed_metrics[samples_tag][attrib] = sample_attributes[i] 
+				indexed_metrics[sample_id][attrib] = sample_attributes[i] 
 			end
 		else
 			query[metric_name] = metric
@@ -30,20 +28,24 @@ end
 
 
 def create_table (indexed_metrics, samples_tag, attributes, metric_names)
+	allTags = attributes + metric_names
 	table_output = []
-	allTags = attributes.concat(metric_names)
-
-	header = allTags.dup
-	header.unshift(samples_tag)
-	table_output << header
+	corrupted_records = []
 	indexed_metrics.each do |sample_name, sample_data|
-		formatted_line = [sample_name]
+		record = [sample_name]
 	 	allTags.each do |tag|
-			formatted_line << sample_data[tag]
+			record << sample_data[tag]
 	 	end
-	 	table_output << formatted_line
+	 	if record.count(nil) > 0
+	 		warn("Record #{sample_name} is corrupted:\n#{record.inspect}")
+	 		corrupted_records << record
+	 	else
+	 		table_output << record
+	 	end
 	end
-	return table_output
+	table_output.unshift(allTags.unshift(samples_tag)) # Add header
+	corrupted_records.unshift(allTags.unshift(samples_tag)) # Add header
+	return table_output, corrupted_records
 end
 
 def save_table(table_output, output_path)
@@ -61,6 +63,7 @@ end
 metric_file = File.readlines(ARGV[0]).map {|line| line = line.chomp.split("\t")}
 attributes = ARGV[1].split(',')
 samples_tag = attributes.shift
-metric_names, indexed_metrics = index_metrics(metric_file, samples_tag, attributes)
-table_output = create_table(indexed_metrics, samples_tag, attributes, metric_names)
+metric_names, indexed_metrics = index_metrics(metric_file, attributes)
+table_output, corrupted_records = create_table(indexed_metrics, samples_tag, attributes, metric_names)
 save_table(table_output, ARGV[2])
+save_table(corrupted_records, ARGV[3]) if !ARGV[3].nil?
