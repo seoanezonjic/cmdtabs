@@ -1,41 +1,29 @@
 #! /usr/bin/env ruby
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
 
-parent_table = {}
-table_length = 0
+require 'optparse'
+require 'cmdtabs'
 
-ARGV.each do |file_name|
-	
-	local_length = 0
-	File.open(file_name).each do |line|
-		line.chomp!
-		n_fields = line.count("\t")+1
-		fields = line.split("\t", n_fields).map{|field| 
-			if field == ""
-				'-'
-			else
-				field
-			end
-		}
-		next if fields.count('-') == fields.length #skip blank records
-		id = fields.shift 
-		local_length = fields.length
-		if !parent_table.has_key?(id)
-			parent_table[id] = Array.new(table_length,'-')
-		elsif parent_table[id].length < table_length
-			parent_table[id].concat(Array.new(table_length-parent_table[id].length,'-'))
-		end
-		parent_table[id].concat(fields)
+#####################################################################
+## OPTIONS
+######################################################################
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
 
-	end
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
 
-	table_length += local_length
-	parent_table.each do |id, fields|
-		diference = table_length - fields.length
-		fields.concat(Array.new(diference,'-')) if diference > 0
-	end
 
-end
+##################################################################################################
+## MAIN
+##################################################################################################
 
-parent_table.each do |id, fields|
-	puts id+"\t"+fields.join("\t")
-end
+files = load_files(ARGV)
+merged = merge_files(files)
+result_table = print_table_from_hash(merged)
+

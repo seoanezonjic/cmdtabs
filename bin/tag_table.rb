@@ -1,33 +1,10 @@
 #!/usr/bin/env ruby
 
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
 require 'optparse'
-def load_and_parse_tags(tags, sep)
-	parsed_tags = []
-	tags.map do |tag| 
-		if File.exist?(tag)
-			File.open(tag).each do |line|
-				parsed_tags << line.chomp.split(sep)
-				break
-			end
-		else
-			parsed_tags << tag.split(sep)
-		end
-	end
-	return parsed_tags.flatten
-end
+require 'cmdtabs'
 
-def tag_and_write_file(input_file, tags, header, sep)
-	empty_header = Array.new(tags.length, "") if header
-	
-		input_file.each_with_index do |fields, n_row|
-			if n_row == 0 && header 
-				puts empty_header.dup.concat(fields).join(sep)
-				next
-			end
-			puts tags.dup.concat(fields).join(sep)
-		end
-	
-end
 
 #################################################################################################
 ## INPUT PARSING

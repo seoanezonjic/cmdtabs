@@ -1,6 +1,15 @@
 #! /usr/bin/env ruby
 
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
+
 require 'optparse'
+require 'cmdtabs'
+
+
+#####################################################################
+## OPTPARSE
+######################################################################
 
 options = {}
 OptionParser.new do |opts|
@@ -33,24 +42,15 @@ OptionParser.new do |opts|
 end.parse!
 
 
-agg_data = {}
+##################################################################################################
+## MAIN
+##################################################################################################
+
 if options[:input] == '-'
-	input = STDIN
+  input_file = STDIN
 else
-	input = File.open(options[:input])
-end
-input.each do |line|
-	fields = line.chomp.split("\t")
-	key = fields[options[:col_index]]
-	val = fields[options[:col_aggregate]]
-	query = agg_data[key]
-	if query.nil?
-		agg_data[key] = [val]
-	else
-		query << val
-	end
+  input_file = File.open(options[:input])
 end
 
-agg_data.each do |key, values|
-	STDOUT.puts "#{key}\t#{values.join(options[:sep])}"
-end
+agg_data = aggregate_column(input_file, options[:col_index], options[:col_aggregate])
+save_aggregated(agg_data, options[:sep])

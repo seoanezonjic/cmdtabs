@@ -1,6 +1,14 @@
 #! /usr/bin/env ruby
 
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
 require 'optparse'
+require 'cmdtabs'
+
+
+#####################################################################
+## OPTPARSE
+######################################################################
 
 options = {}
 OptionParser.new do |opts|
@@ -28,19 +36,16 @@ OptionParser.new do |opts|
 end.parse!
 
 
-agg_data = {}
+##################################################################################################
+## MAIN
+##################################################################################################
+
 if options[:input] == '-'
-	input = STDIN
+  input_file = STDIN
 else
-	input = File.open(options[:input])
+  input_file = File.open(options[:input] )
 end
-input.each do |line|
-	fields = line.chomp.split("\t")
-	target_field = fields[options[:col_index]]
-	target_field.split(options[:sep]).each do |val|
-		record = fields[0..(options[:col_index]-1)] + [val] + fields[(options[:col_index] + 1)..fields.length]
-		#record = fields[0..(options[:col_index] + 1)] + [val] + fields[(options[:col_index] + 1)..fields.length]
-		STDOUT.puts record.join("\t")
-	end
-end
+desagg_data = desaggregate_column(input_file, options[:col_index], options[:sep])
+save_desaggregated(desagg_data)
+
 

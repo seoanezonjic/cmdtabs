@@ -1,6 +1,15 @@
 #! /usr/bin/env ruby
 
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
 require 'optparse'
+require 'cmdtabs.rb'
+
+
+
+#####################################################################
+## OPTPARSE
+######################################################################
 
 options = {}
 OptionParser.new do |opts|
@@ -14,6 +23,11 @@ OptionParser.new do |opts|
 	options[:index_file] = nil
 	opts.on("-I", "--index_file PATH", "Index file ") do |item|
 		options[:index_file] = item
+	end
+
+	options[:output_file] = nil
+	opts.on("-o", "--output_file PATH", "Output file ") do |item|
+		options[:output_file] = item
 	end
 
 	options[:input_separator] = "\t"
@@ -38,22 +52,16 @@ OptionParser.new do |opts|
 
 end.parse!
 
-#Load index
-index = {}
-File.open(options[:index_file]).read.each_line do |line|
-	line.chomp!
-	fields = line.split("\t")
-	index[fields[options[:from]]] = fields[options[:to]]
-end
 
-#Reemplaza nombres
-File.open(options[:input_file]+'_rep','w') do |f| 
-	File.open(options[:input_file]).each do |line|
-		fields = line.chomp.split(options[:input_separator])
-		options[:columns].each do |col|
-			new_string = index[fields[col]]
-			fields[col] = new_string if !new_string.nil?
-		end
-		f.puts fields.join(options[:input_separator])
-	end
-end 
+##################################################################################################
+## MAIN
+##################################################################################################
+
+index = load_and_index_file_index(options[:index_file], options[:from], options[:to])
+
+tabular_input = File.readlines(options[:input_file]).map {|line| line = line.chomp.split(options[:input_separator])}
+
+tabular_output_translated, tabular_output_untraslated = name_replaces(tabular_input, options[:input_separator], options[:columns], index)
+
+save_tabular_with_sep(options[:output_file], options[:input_separator], tabular_output_translated)
+save_tabular_with_sep(options[:output_file], options[:input_separator], tabular_output_untraslated)

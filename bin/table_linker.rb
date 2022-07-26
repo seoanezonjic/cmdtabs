@@ -3,33 +3,60 @@
 # Toma la informacion extraida de un archivo tabulado (donde la primera columna es el idetificador) en base a una lista de identificadores proporcionada
 # la informacion se guarda en el archivo de salida
 
-if ARGV.size < 3
-	puts "Usage: table_linker.rb file_table file_table output_file_name"
-	Process.exit
-end
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
+require 'optparse'
+require 'cmdtabs'
 
-drop_line = false
-if !ARGV[3].nil?
-	drop_line = true
-end
-hash_info={}
 
-#Cargar tabla de informacion en hash en forma {identificador => campos de informacion}
-File.open(ARGV[0],'r').each do |line|
-	fields=line.chomp.split("\t",2)
-	hash_info[fields.first]=fields.last
-end
+#####################################################################
+## OPTPARSE
+######################################################################
 
-save_info=File.open(ARGV[2],'w') #Crea archivo para guardar la informacion
-File.open(ARGV[1],'r').each do |line|
-	line.chomp!
-	fields = line.split("\t")
-	id = fields.first
-	info_id=hash_info[id]
-	if !info_id.nil?
-		save_info.puts line+"\t"+info_id
-	else
-		save_info.puts line if !drop_line
+options = {}
+OptionParser.new do |opts|
+	opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+
+	options[:input_file] = nil
+	opts.on("-i", "--input_file PATH", "Path to input file") do |item|
+		options[:input_file] = item
 	end
-end
-save_info.close
+
+	options[:linker_file] = nil
+	opts.on("-l", "--linker_file PATH", "Path to file linker") do |item|
+		options[:linker_file] = item
+	end
+
+	options[:drop_line] = false
+	opts.on("--drop", "Write the lines whose identifiers have been matched") do |item|
+		options[:drop_line] = true
+	end
+
+	options[:sep] = "\t"
+	opts.on("-s", "--separator STRING", "column character separator") do |item|
+		options[:sep] = item
+	end
+
+	options[:output_file] = nil
+	opts.on("-o", "--output_file PATH", "Output file ") do |item|
+		options[:output_file] = item
+	end
+
+	opts.on_tail("-h", "--help", "Show this message") do
+		puts opts
+		exit
+	end
+end.parse!
+
+
+
+##################################################################################################
+## MAIN
+##################################################################################################
+
+
+indexed_linker = index_linker(options[:linker_file])
+tabular_file = File.readlines(options[:input_file]).map {|line| line = line.chomp}
+
+linked_table = link_table(indexed_linker, tabular_file, options[:drop_line], options[:sep])
+save_tabular_without_sep(options[:output_file], linked_table)

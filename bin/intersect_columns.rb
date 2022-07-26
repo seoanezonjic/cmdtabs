@@ -1,33 +1,10 @@
 #! /usr/bin/env ruby
 
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
 require 'optparse'
+require 'cmdtabs'
 
-#####################################################################
-## METHODS
-######################################################################
-
-def load_records(file, cols, sep, full)
-	recs = {}
-  full_recs = {}
-  if file == '-'
-    input = STDIN
-  else
-	  input = File.open(file)
-  end
-  input.each do |line|
-		fields = line.chomp.split(sep)
-    values = cols.map{|c| fields[c]}
-		recs[values] = true
-    full_recs[values] = fields if full
-	end
-	return recs.keys, full_recs
-end
-
-def print_recs(recs, sep)
-	recs.each do |rec|
-		puts rec.join(sep)
-	end
-end
 
 #####################################################################
 ## OPTPARSE
@@ -96,18 +73,18 @@ if options[:count]
 else
 	if options[:keep] == 'c'
     common = common.map{|r| full_a_rec[r] + full_b_rec[r]} if options[:full]
-		print_recs(common, options[:sep])
+		print_records(common, options[:sep])
 	elsif options[:keep] == 'a'
     a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
-		print_recs(a_only, options[:sep])
+		print_records(a_only, options[:sep])
 	elsif options[:keep] == 'b'
     b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
-		print_recs(b_only, options[:sep])
+		print_records(b_only, options[:sep])
 	elsif options[:keep] == 'ab'
     if options[:full]
       a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
       b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
     end
-		print_recs(a_only + b_only, options[:sep])
+		print_records(a_only + b_only, options[:sep])
 	end
 end

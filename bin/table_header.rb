@@ -1,115 +1,12 @@
 #!/usr/bin/env ruby
 
+ROOT_PATH = File.dirname(__FILE__)
+$LOAD_PATH.unshift(File.expand_path(File.join(ROOT_PATH, '..', 'lib')))
+
 require 'find'
 require 'optparse'
+require 'cmdtabs'
 
-#################################################################################################
-## FUNCTIONS
-#################################################################################################
-def parse_cols(col_string)
-    cols = col_string.split(',').map{|col| col.to_i}
-    return cols
-end
-
-def build_pattern(col_filter, keywords)
-    pattern = {}
-    if col_filter.nil? || keywords.nil?
-    else
-        keys_per_col = keywords.split('%')
-        if keys_per_col.length != col_filter.length
-            puts 'Number of keywords not equal to number of filtering columns'
-            Process.exit
-        end
-        col_filter.each_with_index do |col, i|
-            pattern[col] = keys_per_col[i].split('&')
-        end
-    end
-    return pattern
-end
-
-def match(string, key, match_mode)
-    match = false
-    if string.nil?
-        match = false
-    elsif  match_mode == 'i'
-        match = string.include?(key)
-    elsif match_mode == 'c'
-        if string == key
-            match = true
-        end
-    end
-    return match
-end
-
-def filter(header, pattern, search_mode, match_mode, reverse = false)
-    filter = false
-    pattern.each do |col,keys|
-        match = false
-        keys.each do |key|
-            if match(header[col], key, match_mode)
-                match =true
-            end
-        end
-        if match
-            if search_mode == 's'
-                filter = false
-                break
-            end
-        elsif !match && search_mode == 'c'
-            filter = true
-            break
-        elsif !match
-            filter = true
-        end
-    end
-    if reverse
-        filter = !filter
-    end
-    return filter
-end
-
-def check_file(file, names, options, pattern)
-    if file == '-'
-        input = STDIN
-    else
-        input = File.open(file)
-    end
-    relations = relations(options[:column])
-	input.read.each_line do |line|
-		line.chomp!
-		header = line.split(options[:separator])
-        if pattern.nil? || !filter(header, pattern, options[:search_mode], options[:match_mode], options[:reverse])
-            options[:column].each do |col|
-        		if !options[:check_uniq] || !names[relations[col]].include?(header[col]) 
-        			names[relations[col]] << header[col]
-        		end
-            end
-        end
-	end
-	return names
-end
-
-def relations(column)
-    relations = {}
-    column.each_with_index do |col,i|
-        relations[col] = i
-    end
-    return relations
-end
-
-def report(names)
-    n_col = names.length
-    names.first.length.times do |y|
-        n_col.times do |x|
-		string = "#{names[x][y]}"
-		if x < n_col-1
-			string << "\t"
-		end
-            print string
-        end
-        puts
-    end
-end
 
 #################################################################################################
 ## INPUT PARSING
@@ -124,12 +21,12 @@ optparse = OptionParser.new do |opts|
 
         options[:column] = [0]
         opts.on( '-c', '--column STRING', 'Column/s to show. Format: x,y,z..' ) do |column|            
-                options[:column] = parse_cols(column)
+                options[:column] = parse_column_indices(sep = ",", column)
         end
 
         options[:col_filter] = nil
         opts.on( '-f', '--col_filter STRING', 'Select columns where search keywords. Format: x,y,z..' ) do |col_filter|
-                options[:col_filter] =  parse_cols(col_filter)
+                options[:col_filter] =  parse_column_indices(sep = ",", col_filter)
         end      
 
         options[:keywords] = nil
