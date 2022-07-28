@@ -69,7 +69,7 @@ end.parse!
 storage = []
 x = Xsv.open(options[:input_file])
 sheet = x.sheets[options[:sheet_number]]
-extract_data_from_sheet(sheet, storage, options[:header_id], options[:id_col], options[:data_col])
+extract_data_from_sheet(sheet, storage, options[:header_id], options[:id_col], options[:data_col], options[:data_type])
 write_tab_file(storage, options[:output_file])
 
 

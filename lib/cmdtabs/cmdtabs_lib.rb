@@ -388,14 +388,14 @@ def tag_and_write_file(input_file, tags, header, sep)
 	end
 end
 
-def extract_data_from_sheet(sheet, storage, header, id_col, data_col)
+def extract_data_from_sheet(sheet, storage, header, id_col, data_col, data_type)
 	sheet.each do |row|
 	  #eliminate header
 	  #parse hpo
 	  next if row.include?(header)
 	  id_col = row[id_col - 1]
 	  data_col = row[data_col - 1]
-	  if options[:data_type] == 'enod'
+	  if data_type == 'enod'
 	    #ENOD dataset has spaces within HPO codes (HP: ). They must be parsed.
 	    data_col = data_col.gsub('HP: ', 'HP:').split(' ')
 	  end
