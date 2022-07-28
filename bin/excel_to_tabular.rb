@@ -18,19 +18,9 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
 
-  options[:id_col] = 1
-  opts.on("-c", "--id_col INTEGER", "Column number to select IDs. Default 1") do |data|
-    options[:id_col] = data.to_i
-  end
-
-  options[:data_col] = 2
-  opts.on("-d", "--data_col INTEGER", "Column number to select data. Default 1") do |data|
-    options[:data_col] = data.to_i
-  end
-
-  options[:header_id] = nil
-  opts.on("-e", "--header_id STRING", "Header identifier. Use it whether it needs to be removed") do |data|
-    options[:header_id] = data
+  options[:columns2extract] = [0]
+  opts.on("-c", "--columns2extract INTEGER", "Column position to extract. Default 1") do |data|
+    options[:columns2extract] = data.split(',').map{|a| a.to_i - 1}
   end
 
   options[:input_file] = nil
@@ -43,14 +33,9 @@ OptionParser.new do |opts|
     options[:output_file] = path
   end
 
-  options[:sheet_number] = 1
+  options[:sheet_number] = 0
   opts.on("-s", "--sheet_number INTEGER", "Sheet number to work with. Default 1") do |data|
-    options[:sheet_number] = data.to_i
-  end
-
-  options[:data_type] = nil
-  opts.on("-t", "--data_type STRING", "Data type to apply corrections. Options: enod.") do |data|
-    options[:data_type] = data
+    options[:sheet_number] = data.to_i - 1
   end
 
   opts.on_tail("-h", "--help", "Show this message") do
@@ -66,27 +51,7 @@ end.parse!
 
 #See https://github.com/martijn/xsv
 
-storage = []
 x = Xsv.open(options[:input_file])
 sheet = x.sheets[options[:sheet_number]]
-extract_data_from_sheet(sheet, storage, options[:header_id], options[:id_col], options[:data_col], options[:data_type])
-write_tab_file(storage, options[:output_file])
-
-
-
-# sheet_names = x.sheets.map(&:name)
-# sheet_names.each do |sht_name|
-#   sheet = x.sheets_by_name(sht_name).first
-#   sht_name.gsub!(/[,\. ]/ , "_")
-#   File.open(options[:output_file] + '_' + sht_name, 'w') do |f|
-#     sheet.each do |row|
-#       first_cell = row[0]
-#       next if first_cell.nil? || first_cell.class == Date
-#       first_cell.gsub!(/^[\(,]/, '')
-#       first_cell.gsub!(/[\),]$/, '')
-#       first_cell.strip!
-#       next if first_cell.empty?
-#       f.puts first_cell
-#     end
-#   end
-# end
+storage = extract_data_from_sheet(sheet, options[:columns2extract])
+save_tabular_with_sep(options[:output_file], "\t", storage)
