@@ -387,3 +387,28 @@ def tag_and_write_file(input_file, tags, header, sep)
 		puts tags.dup.concat(fields).join(sep)
 	end
 end
+
+def extract_data_from_sheet(sheet, storage, header, id_col, data_col)
+	sheet.each do |row|
+	  #eliminate header
+	  #parse hpo
+	  next if row.include?(header)
+	  id_col = row[id_col - 1]
+	  data_col = row[data_col - 1]
+	  if options[:data_type] == 'enod'
+	    #ENOD dataset has spaces within HPO codes (HP: ). They must be parsed.
+	    data_col = data_col.gsub('HP: ', 'HP:').split(' ')
+	  end
+	  data_col.each do |data|
+	    storage << [id_col, data]
+	  end
+	end
+end
+
+def write_tab_file(output_path, content)
+	File.open(output_path, 'w') do |f|
+	  content.each do |row|
+	    f.puts "#{row.join("\t")}"
+	  end
+	end
+end
