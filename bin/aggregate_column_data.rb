@@ -46,11 +46,6 @@ end.parse!
 ## MAIN
 ##################################################################################################
 
-if options[:input] == '-'
-  input_file = STDIN
-else
-  input_file = File.open(options[:input])
-end
-
-agg_data = aggregate_column(input_file, options[:col_index], options[:col_aggregate])
-save_aggregated(agg_data, options[:sep])
+input_table = load_input_data(options[:input])
+agg_data = aggregate_column(input_table, options[:col_index], options[:col_aggregate], options[:sep])
+write_output_data(agg_data)

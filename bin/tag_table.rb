@@ -48,6 +48,7 @@ optparse.parse!
 ## MAIN
 ##################################################################################################
 
-input_file = File.readlines(options[:input_file]).map{|line| line.chomp.split("\t") }
+input_table = load_input_data(options[:input_file])
 tags = load_and_parse_tags(options[:tags], options[:sep])
-tag_and_write_file(input_file, tags, options[:header], options[:sep])
+taged_table = tag_file(input_table, tags, options[:header])
+write_output_data(taged_table, nil, options[:sep])

@@ -60,8 +60,11 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-a_records, full_a_rec = load_records(options[:a_file], options[:a_cols], options[:sep], options[:full])
-b_records, full_b_rec = load_records(options[:b_file], options[:b_cols], options[:sep], options[:full])
+input_data_a = load_input_data(options[:a_file], options[:sep])
+input_data_b = load_input_data(options[:b_file], options[:sep])
+
+a_records, full_a_rec = load_records(input_data_a, options[:a_cols], options[:full])
+b_records, full_b_rec = load_records(input_data_b, options[:b_cols], options[:full])
 
 common = a_records & b_records
 a_only = a_records - common
@@ -73,18 +76,18 @@ if options[:count]
 else
 	if options[:keep] == 'c'
     common = common.map{|r| full_a_rec[r] + full_b_rec[r]} if options[:full]
-		print_records(common, options[:sep])
+		write_output_data(common, nil, options[:sep])
 	elsif options[:keep] == 'a'
     a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
-		print_records(a_only, options[:sep])
+		write_output_data(a_only, nil, options[:sep])
 	elsif options[:keep] == 'b'
     b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
-		print_records(b_only, options[:sep])
+		write_output_data(b_only, nil, options[:sep])
 	elsif options[:keep] == 'ab'
     if options[:full]
       a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
       b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
     end
-		print_records(a_only + b_only, options[:sep])
+		write_output_data(a_only + b_only, nil, options[:sep])
 	end
 end

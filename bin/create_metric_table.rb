@@ -28,10 +28,10 @@ end.parse!
 ##################################################################################################
 ## MAIN
 ##################################################################################################
-metric_file = File.readlines(ARGV[0]).map {|line| line = line.chomp.split("\t")}
+metric_file = load_input_data(ARGV[0])
 attributes = ARGV[1].split(',')
 samples_tag = attributes.shift
 metric_names, indexed_metrics = index_metrics(metric_file, attributes)
 table_output, corrupted_records = create_table(indexed_metrics, samples_tag, attributes, metric_names)
-save_table(table_output, ARGV[2])
-save_table(corrupted_records, options[:corrupted]) if !options[:corrupted].nil? && !corrupted_records.empty?
+write_output_data(table_output, ARGV[2])
+write_output_data(corrupted_records, options[:corrupted]) if !options[:corrupted].nil? && !corrupted_records.empty?

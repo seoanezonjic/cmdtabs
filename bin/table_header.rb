@@ -19,9 +19,9 @@ optparse = OptionParser.new do |opts|
             options[:table_file] = table_file
         end
 
-        options[:column] = [0]
+        options[:cols_to_show] = nil
         opts.on( '-c', '--column STRING', 'Column/s to show. Format: x,y,z..' ) do |column|            
-                options[:column] = parse_column_indices(sep = ",", column)
+                options[:cols_to_show] = parse_column_indices(sep = ",", column)
         end
 
         options[:col_filter] = nil
@@ -68,37 +68,15 @@ optparse = OptionParser.new do |opts|
                 exit
         end
 
-end # End opts
-
-# parse options and remove from ARGV
+end 
 optparse.parse!
 
 ##################################################################################################
 ## MAIN
 ##################################################################################################
-if options[:table_file].nil?
-	puts 'Tabulated file not specified'
-	Process.exit
-end
-
-pattern = build_pattern(options[:col_filter], options[:keywords])
-
-names = []
-options[:column].length.times do
-    names << []
-end
-if options[:table_file].include?('*')
-	Find.find(Dir.pwd) do |path|
-		if FileTest.directory?(path)
-			next
-		else
-           	if File.basename(path) =~ /#{options[:table_file]}/
-				names = check_file(path, names, options, pattern) 
-			end
-		end
-	end	
-else
-	names = check_file(options[:table_file], names, options, pattern)
-end
-
-report(names)
+abort('Tabulated file not specified') if options[:table_file].nil?
+file_names = Dir.glob(options[:table_file])
+input_files = load_several_files(file_names, options[:separator])
+filtered_table = merge_and_filter_tables(input_files, options)
+write_output_data(filtered_table)
+ 

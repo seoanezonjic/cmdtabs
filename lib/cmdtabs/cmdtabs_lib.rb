@@ -1,11 +1,55 @@
 #!/usr/bin/env ruby 
 
+
+def load_input_data(input_path, sep="\t", limit=0)
+	if input_path == '-'
+	  input_data = STDIN
+	else
+	  input_data = File.readlines(input_path)
+	end
+	input_data_arr = input_data.map {|line| line = line.chomp.split(sep, limit)}
+	return input_data_arr
+end 
+
+def load_several_files(all_files, sep = "\t", limit=0)
+        loaded_files = {}
+        all_files.each do |file|
+        		if FileTest.directory?(file)
+                	STDERR.puts "#{file} is not a valid file"
+                	next
+                end
+                loaded_files[file] = load_input_data(file, sep, limit)
+        end
+        return loaded_files
+end
+
+def index_array(array, col_from=0, col_to=1)
+	indexed_array = {}
+	array.each do |elements|
+		indexed_array[elements[col_from]] = elements[col_to]
+	end
+	return indexed_array
+end
+
+def write_output_data(output_data, output_path=nil, sep="\t")
+	if !output_path.nil?
+		File.open(output_path, 'w') do |out_file|
+			output_data.each do |line|
+				out_file.puts(line.join(sep))
+			end
+		end
+	else
+		output_data.each do |line|
+			STDOUT.puts line.join(sep)		
+		end
+	end
+end
+
 # aggregate_column_data.rb
-def aggregate_column (input_table, col_index, col_agg)
-  input_table
+def aggregate_column (input_table, col_index, col_agg, sep)
   aggregated_data = {}
-  input_table.each do |line|
-    fields = line.chomp.split("\t")
+  aggregated_data_arr = []
+  input_table.each do |fields|
     key = fields[col_index]
     val = fields[col_agg]
     query = aggregated_data[key]
@@ -15,22 +59,18 @@ def aggregate_column (input_table, col_index, col_agg)
       query << val
     end
   end
-  return aggregated_data
+  aggregated_data.each do |k, value|
+  	aggregated_data_arr << [k, value.join(sep)]
+  end
+  return aggregated_data_arr
 end
 
-def save_aggregated (agg_data, sep)
-	agg_data.each do |key, values|
-		STDOUT.puts "#{key}\t#{values.join(sep)}"		
-	end
-	
-end
 
 # desaggregate_column_data.rb
 def desaggregate_column (input_table, col_index, sep)
   desaggregated_data = []
     
-  input_table.each do |line|
-    fields = line.chomp.split("\t")
+  input_table.each do |fields|
     aggregated_fields = fields[col_index]
     aggregated_fields.split(sep).each do |field|
       record = fields[0..(col_index - 1)] + [field] + fields[(col_index + 1)..fields.length]
@@ -42,12 +82,6 @@ def desaggregate_column (input_table, col_index, sep)
   return desaggregated_data
 end
 
-def save_desaggregated (desagg_data)
-	desagg_data.each do |line|
-		STDOUT.puts line.join("\t")
-		
-	end
-end
 
 # create_metric_table.rb
 def index_metrics(input_data, attributes)
@@ -94,48 +128,28 @@ def create_table (indexed_metrics, samples_tag, attributes, metric_names)
 	return table_output, corrupted_records
 end
 
-def save_table(table_output, output_path)
-	File.open(output_path, 'w') do |out_file|
-		table_output.each do |line|
-			out_file.puts(line.join("\t"))
-		end
-	end
-end
 
 #intersect_columns.rb
-def load_records(path_file, cols, sep, full)
+def load_records(input_file, cols, full)
 	records = {}
 	full_row_of_records = {}
-	if path_file == '-'
-		input_file  = STDIN
-	else
-		input_file = File.open(path_file)
-	end
-	input_file.each do |line|
-		fields = line.chomp.split(sep)
+	input_file.each do |fields|
 		field = cols.map { |c| fields[c]}
-		records[field = true]
+		records[field] = true
 		full_row_of_records[field] = fields if full
 	end
 	return records.keys, full_row_of_records
 end
 
-def print_records(records, sep)
-	records.each do |record|
-		puts record.join(sep)
-	end
-end
 
 # merge_tabular.rb
 def load_files (files_path)
 	files = {}
-	
 	files_path.each do |file_name|
 		file = []
-		File.open(file_name).each do |line|
-			line.chomp!
-			n_fields = line.count("\t")+1
-			fields = line.split("\t", n_fields).map{|field|
+		input_table = load_input_data(file_name)
+		input_table.each do |fields|
+			fields.map{|field|
 				if field == ""
 					'-'
 				else
@@ -153,6 +167,7 @@ end
 
 def merge_files (files)
 	parent_table = {}
+	parent_table_arr = []
 	table_length = 0
 	files.each do |file_names, file|
 		local_length = 0
@@ -173,10 +188,11 @@ def merge_files (files)
 		parent_table.each do |id, fields|
 			diference = table_length - fields.length
 			fields.concat(Array.new(diference,'-')) if diference > 0
+			parent_table_arr << [id, fields]
 		end
 			
 	end
-	return parent_table
+	return parent_table_arr
 end
 
 
@@ -188,11 +204,9 @@ def print_table_from_hash(parent_table)
 end
 
 # standard_name_replacer.rb
-def load_and_index_file_index (path_file_index, col_from, col_to)
+def index_file_index (input_index, col_from, col_to)
 	indexed_file_index = {}
-	File.open(path_file_index).read.each_line do |line|
-		line.chomp!
-		fields = line.split("\t")
+	input_index.each do |fields|
 		indexed_file_index[fields[col_from]] = fields[col_to]
 	end
 	return indexed_file_index
@@ -215,15 +229,30 @@ def name_replaces (tabular_input, sep, cols_to_replace, indexed_file_index)
 	return translated_fields, untranslated_fields
 end
 
-def save_tabular_with_sep (output_path, sep, tabular_output) 
-	File.open(output_path,'w') do |out_file|
-		tabular_output.each do |line|
-			out_file.puts line.join(sep)
-		end
-	end
-end 
 
 # table_header
+def merge_and_filter_tables(input_files, options)
+        header = []
+        filtered_table = []
+        options[:cols_to_show] = (0..input_files.first[0].length - 1).to_a if options[:cols_to_show].nil?
+        input_files.each do |filename, file|
+            if options[:header].nil?
+                if header.empty? 
+                    header = file.shift
+                else
+        	        file.shift
+        	    end 
+        	end
+        	filtered_table = filtered_table.concat(filter_columns(file, options)) 
+        end	
+        filtered_table = filtered_table.uniq if options[:uniq]
+        if !header.empty?
+	        header = shift_by_array_indexes(header, options[:cols_to_show])
+	        filtered_table.unshift(header)
+		end
+        return filtered_table
+end
+
 def parse_column_indices(sep, col_string)
     cols = col_string.split(sep).map{|col| col.to_i}
     return cols
@@ -233,10 +262,7 @@ def build_pattern(col_filter, keywords)
     pattern = {}
     if !col_filter.nil? && !keywords.nil?
         keys_per_col = keywords.split('%')
-        if keys_per_col.length != col_filter.length
-            puts 'Number of keywords not equal to number of filtering columns'
-            Process.exit
-        end
+        abort('Number of keywords not equal to number of filtering columns') if keys_per_col.length != col_filter.length
         col_filter.each_with_index do |col, i|
             pattern[col] = keys_per_col[i].split('&')
         end
@@ -244,38 +270,28 @@ def build_pattern(col_filter, keywords)
     return pattern
 end
 
-def match(string, key, match_mode)
-    match = false
-    if string.nil?
-        match = false
-    elsif  match_mode == 'i'
-        match = string.include?(key)
-    elsif match_mode == 'c'
-        if string == key
-            match = true
-        end
-    end
-    return match
+def expanded_match(string, pattern, match_mode)
+    is_match = false
+    is_match = true if string.include?(pattern) && match_mode == 'i'
+    is_match = true if string == pattern && match_mode == 'c'
+    return is_match
 end
 
-def filter(header, pattern, search_mode, match_mode, reverse = false)
+def filter(line, all_patterns, search_mode, match_mode, reverse = false)
     filter = false
-    pattern.each do |col,keys|
-        match = false
-        keys.each do |key|
-            if match(header[col], key, match_mode)
-                match =true
-            end
+    all_patterns.each do |col, patterns|
+        is_match = false
+        patterns.each do |pattern|
+            is_match = expanded_match(line[col], pattern, match_mode)
+        	break if is_match     
         end
-        if match
-            if search_mode == 's'
-                filter = false
-                break
-            end
-        elsif !match && search_mode == 'c'
+        if is_match && search_mode == 's'
+            filter = false
+            break
+        elsif !is_match && search_mode == 'c'
             filter = true
             break
-        elsif !match
+        elsif !is_match
             filter = true
         end
     end
@@ -285,91 +301,60 @@ def filter(header, pattern, search_mode, match_mode, reverse = false)
     return filter
 end
 
-def check_file(file, names, options, pattern)
-    if file == '-'
-        input = STDIN
-    else
-        input = File.open(file)
-    end
-    relations = relations(options[:column])
-	input.read.each_line do |line|
-		line.chomp!
-		header = line.split(options[:separator])
-        if pattern.nil? || !filter(header, pattern, options[:search_mode], options[:match_mode], options[:reverse])
-            options[:column].each do |col|
-        		if !options[:check_uniq] || !names[relations[col]].include?(header[col]) 
-        			names[relations[col]] << header[col]
-        		end
-            end
+def filter_columns(input_table, options)
+	pattern = build_pattern(options[:col_filter], options[:keywords])
+	filtered_table = []
+	input_table.each do |line|
+        if pattern.nil? || !filter(line, pattern, options[:search_mode], options[:match_mode], options[:reverse])
+        	filtered_table << shift_by_array_indexes(line, options[:cols_to_show]) 
         end
 	end
-	return names
+	return filtered_table
 end
 
-def relations(column)
-    relations = {}
-    column.each_with_index do |col,i|
-        relations[col] = i
+def shift_by_array_indexes(arr_sub, indexes)
+	subsetted_arr = []
+	indexes.each do |idx|
+    	subsetted_arr << arr_sub[idx]
     end
-    return relations
-end
-
-def report(names)
-    n_col = names.length
-    names.first.length.times do |y|
-        n_col.times do |x|
-		string = "#{names[x][y]}"
-		if x < n_col-1
-			string << "\t"
-		end
-            print string
-        end
-        puts
-    end
+    return subsetted_arr
 end
 
 # table_linker.rb
-def index_linker (file_linker)
-	indexed_linker = {}
-	File.open(file_linker,'r').each do |line|
-		fields = line.chomp.split("\t",2)
-		indexed_linker[fields.first] = fields.last
-	end
-	return indexed_linker
-end
-
 def link_table (indexed_linker, tabular_file, drop_line, sep)
 	linked_table = []
-	tabular_file.each do |line|
-		fields = line.split(sep)
+	tabular_file.each do |fields|
 		id = fields.first
 		info_id = indexed_linker[id]
 		if !info_id.nil?
-			linked_table << line+sep+info_id
+			linked_table << fields.push(info_id)
 		else
-			linked_table << line if !drop_line
+			linked_table << fields if !drop_line
 		end
 	end
 	return linked_table
 end
 
-def save_tabular_without_sep (output_path, linked_table)
-	File.open(output_path,'w') do |out_file|
-		linked_table.each do |line|
-			out_file.puts line
-		end
-	end
+def load_several_files(all_files, sep = "\t", limit=0)
+        loaded_files = {}
+        all_files.each do |file|
+        		if FileTest.directory?(file)
+                	STDERR.puts "#{file} is not a valid file"
+                	next
+                end
+                loaded_files[file] = load_input_data(file, sep, limit)
+        end
+        return loaded_files
 end
+
 
 # tag_table.rb
 def load_and_parse_tags(tags, sep)
 	parsed_tags = []
 	tags.map do |tag| 
 		if File.exist?(tag)
-			File.open(tag).each do |line|
-				parsed_tags << line.chomp.split(sep)
-				break
-			end
+			parsed_tags << load_input_data(tag, sep)
+			break
 		else
 			parsed_tags << tag.split(sep)
 		end
@@ -377,17 +362,21 @@ def load_and_parse_tags(tags, sep)
 	return parsed_tags.flatten
 end
 
-def tag_and_write_file(input_file, tags, header, sep)
+def tag_file(input_file, tags, header)
+	taged_file = []
 	empty_header = Array.new(tags.length, "") if header
 	input_file.each_with_index do |fields, n_row|
-		if n_row == 0 && header 
-			puts empty_header.dup.concat(fields).join(sep)
+		if n_row == 0 && header
+			taged_file <<empty_header.dup.concat(fields)
 			next
 		end
-		puts tags.dup.concat(fields).join(sep)
+		taged_file << tags.dup.concat(fields)
 	end
+	return taged_file
 end
 
+
+# excel_to_tabular.rb
 def extract_data_from_sheet(sheet, columns2extract)
 	storage = []
 	sheet.each do |row|

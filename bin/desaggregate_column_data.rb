@@ -40,12 +40,8 @@ end.parse!
 ## MAIN
 ##################################################################################################
 
-if options[:input] == '-'
-  input_file = STDIN
-else
-  input_file = File.open(options[:input] )
-end
-desagg_data = desaggregate_column(input_file, options[:col_index], options[:sep])
-save_desaggregated(desagg_data)
+input_table = load_input_data(options[:input])
+desagg_data = desaggregate_column(input_table, options[:col_index], options[:sep])
+write_output_data(desagg_data)
 
 

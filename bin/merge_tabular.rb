@@ -25,5 +25,4 @@ end.parse!
 
 files = load_files(ARGV)
 merged = merge_files(files)
-result_table = print_table_from_hash(merged)
-
+write_output_outpu(merged)

@@ -54,4 +54,4 @@ end.parse!
 x = Xsv.open(options[:input_file])
 sheet = x.sheets[options[:sheet_number]]
 storage = extract_data_from_sheet(sheet, options[:columns2extract])
-save_tabular_with_sep(options[:output_file], "\t", storage)
+write_output_data(storage, options[:output_file])

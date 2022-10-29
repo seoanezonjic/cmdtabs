@@ -57,11 +57,12 @@ end.parse!
 ## MAIN
 ##################################################################################################
 
-index = load_and_index_file_index(options[:index_file], options[:from], options[:to])
+input_index = load_input_data(options[:index_file])
+indexed_index = index_array(input_index, options[:from], options[:to])
 
-tabular_input = File.readlines(options[:input_file]).map {|line| line = line.chomp.split(options[:input_separator])}
+input_table = load_input_data(options[:input_file], options[:input_separator])
 
-tabular_output_translated, tabular_output_untraslated = name_replaces(tabular_input, options[:input_separator], options[:columns], index)
+tabular_output_translated, tabular_output_untraslated = name_replaces(input_table, options[:input_separator], options[:columns], indexed_index)
 
-save_tabular_with_sep(options[:output_file], options[:input_separator], tabular_output_translated)
-save_tabular_with_sep(options[:output_file], options[:input_separator], tabular_output_untraslated)
+write_output_data(tabular_output_translated, options[:output_file], options[:input_separator])
+write_output_data(tabular_output_untraslated, options[:output_file], options[:input_separator])

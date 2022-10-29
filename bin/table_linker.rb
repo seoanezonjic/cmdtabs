@@ -54,9 +54,9 @@ end.parse!
 ## MAIN
 ##################################################################################################
 
+input_linker = load_input_data(options[:linker_file])
+indexed_linker = index_array(input_linker)
+input_table = load_input_data(options[:input_file], "\t", 2)
 
-indexed_linker = index_linker(options[:linker_file])
-tabular_file = File.readlines(options[:input_file]).map {|line| line = line.chomp}
-
-linked_table = link_table(indexed_linker, tabular_file, options[:drop_line], options[:sep])
-save_tabular_without_sep(options[:output_file], linked_table)
+linked_table = link_table(indexed_linker, input_table, options[:drop_line], options[:sep])
+write_output_data(linked_table, options[:output_file])
