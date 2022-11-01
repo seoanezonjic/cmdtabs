@@ -25,4 +25,4 @@ end.parse!
 
 files = load_files(ARGV)
 merged = merge_files(files)
-write_output_outpu(merged)
+write_output_data(merged)
