@@ -9,12 +9,26 @@ class Tests < MiniTest::Test
 
 	#load_input_data
 	def test_load_input_data
-		file = File.join(DATA_TEST_PATH, 'cluster_genes_dis_agg')
-		load_data_test = load_input_data(file)
+		input_file = File.join(DATA_TEST_PATH, 'cluster_genes_dis_agg')
+		load_data_test = load_input_data(input_file)
 		expected_result = [['HGNC:21197', '483_ref,1039_ref,1071_ref'], ['HGNC:21143', '211_ref,4705_ref']]
 		assert_equal expected_result, load_data_test
-
 	end
+
+	def test_load_input_data_sep
+		input_file = File.join(DATA_TEST_PATH, 'cluster_genes_dis_agg')
+		load_data_test = load_input_data(input_file, ",")
+		expected_result = [["HGNC:21197\t483_ref", "1039_ref", "1071_ref"], ["HGNC:21143\t211_ref", "4705_ref"]]
+		assert_equal expected_result, load_data_test
+	end
+
+	def test_load_input_data_sep_and_limit
+		input_file = File.join(DATA_TEST_PATH, 'cluster_genes_dis_agg')
+		load_data_test = load_input_data(input_file, ",", 2)
+		expected_result = [["HGNC:21197\t483_ref", "1039_ref,1071_ref"], ["HGNC:21143\t211_ref", "4705_ref"]]
+		assert_equal expected_result, load_data_test
+	end
+
 
 	# index_array
 	def test_index_array
@@ -110,10 +124,20 @@ class Tests < MiniTest::Test
 			["MONDO:0013969", "HGNC:21176", "1189_ref"], ["MONDO:0018053", "HGNC:21157"]]
 		assert_equal expected_result, linked_test
 	end
+	def test_link_table_drop
+		input_linker = load_input_data(File.join(DATA_TEST_PATH, 'disease_cluster'))
+		indexed_linker = index_array(input_linker)
+		input_table = load_input_data(File.join(DATA_TEST_PATH, 'disease_gene'), "\t", 2)
+		linked_test = link_table(indexed_linker, input_table, true, "\t")
+		expected_result = [["MONDO:0010193", "HGNC:3527", "54_ref"], ["MONDO:0008995", "HGNC:16873", "19_ref"], 
+			["MONDO:0017999", "HGNC:21197", "53_ref"], ["MONDO:0011142", "HGNC:21144", "66_ref"], 
+			["MONDO:0013969", "HGNC:21176", "1189_ref"]]
+		assert_equal expected_result, linked_test
+	end
 
 	# tag_table_tests
-	def test_load_and_parse_tags_file
-		input_tags = 'MERGED_net_no_raw_cpm,MERGED,no,no,cpm'
+	def test_load_and_parse_tags_stdin
+		input_tags = ['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm']
 		tag_test = load_and_parse_tags(input_tags, "\t")
 		expected_result = ['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm']
 		assert_equal expected_result, tag_test
@@ -131,6 +155,15 @@ class Tests < MiniTest::Test
 		tags = load_and_parse_tags([File.join(DATA_TEST_PATH, 'tracker')], "\t")
 		taged_test = tag_file(input_table, tags, false)
 		expected_result = [['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm', 'HGNC:21197', '483_ref,1039_ref,1071_ref'], 
+			['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm', 'HGNC:21143', '211_ref,4705_ref']]
+		assert_equal expected_result, taged_test
+	end
+
+	def test_tag_file_header
+		input_table = load_input_data(File.join(DATA_TEST_PATH, 'cluster_genes_dis_agg'))
+		tags = load_and_parse_tags([File.join(DATA_TEST_PATH, 'tracker')], "\t")
+		taged_test = tag_file(input_table, tags, true)
+		expected_result = [['', '', '', '', '', 'HGNC:21197', '483_ref,1039_ref,1071_ref'], 
 			['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm', 'HGNC:21143', '211_ref,4705_ref']]
 		assert_equal expected_result, taged_test
 	end
