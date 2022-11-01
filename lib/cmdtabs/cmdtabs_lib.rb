@@ -196,22 +196,7 @@ def merge_files (files)
 end
 
 
-def print_table_from_hash(parent_table)
-	parent_table.each do |id, fields|
-		puts id+"\t"+fields.join("\t")
-	end
-	
-end
-
 # standard_name_replacer.rb
-def index_file_index (input_index, col_from, col_to)
-	indexed_file_index = {}
-	input_index.each do |fields|
-		indexed_file_index[fields[col_from]] = fields[col_to]
-	end
-	return indexed_file_index
-end
-
 def name_replaces (tabular_input, sep, cols_to_replace, indexed_file_index)
 	translated_fields = []
 	untranslated_fields = []
@@ -334,19 +319,6 @@ def link_table (indexed_linker, tabular_file, drop_line, sep)
 	end
 	return linked_table
 end
-
-def load_several_files(all_files, sep = "\t", limit=0)
-        loaded_files = {}
-        all_files.each do |file|
-        		if FileTest.directory?(file)
-                	STDERR.puts "#{file} is not a valid file"
-                	next
-                end
-                loaded_files[file] = load_input_data(file, sep, limit)
-        end
-        return loaded_files
-end
-
 
 # tag_table.rb
 def load_and_parse_tags(tags, sep)
