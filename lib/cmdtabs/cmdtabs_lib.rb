@@ -215,7 +215,7 @@ def name_replaces (tabular_input, sep, cols_to_replace, indexed_file_index)
 end
 
 
-# table_header
+# column_filter
 def merge_and_filter_tables(input_files, options)
         header = []
         filtered_table = []
