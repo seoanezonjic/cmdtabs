@@ -19,8 +19,8 @@ OptionParser.new do |opts|
   opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
 
   options[:columns2extract] = [0]
-  opts.on("-c", "--columns2extract INTEGER", "Column position to extract. Default 1") do |data|
-    options[:columns2extract] = data.split(',').map{|a| a.to_i - 1}
+  opts.on("-c", "--columns2extract INTEGER", "Column position to extract (1 based). Default 1") do |data|
+    options[:columns2extract] = parse_column_indices(sep = ",", item)
   end
 
   options[:input_file] = nil

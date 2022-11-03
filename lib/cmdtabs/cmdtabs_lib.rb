@@ -239,7 +239,7 @@ def merge_and_filter_tables(input_files, options)
 end
 
 def parse_column_indices(sep, col_string)
-    cols = col_string.split(sep).map{|col| col.to_i}
+    cols = col_string.split(sep).map{|col| col.to_i- 1}
     return cols
 end
 

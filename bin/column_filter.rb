@@ -20,7 +20,7 @@ optparse = OptionParser.new do |opts|
         end
 
         options[:cols_to_show] = nil
-        opts.on( '-c', '--column STRING', 'Column/s to show. Format: x,y,z..' ) do |column|            
+        opts.on( '-c', '--column STRING', 'Column/s to show (1 based). Format: x,y,z..' ) do |column|            
                 options[:cols_to_show] = parse_column_indices(sep = ",", column)
         end
 

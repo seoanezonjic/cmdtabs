@@ -36,18 +36,18 @@ OptionParser.new do |opts|
 	end
 
 	options[:columns] = [1]
-	opts.on("-c", "--columns STRING", "Columns indexes, comma separated, to perform the ID translations.") do |item|
-		options[:columns] = item.split(','). map{|i| i.to_i - 1}
+	opts.on("-c", "--columns STRING", "Columns indexes (1 based), comma separated, to perform the ID translations.") do |item|
+    	options[:columns] = parse_column_indices(sep = ",", item)
 	end
 
-	options[:from] = 0
+	options[:from] = [0]
 	opts.on("-f", "--from INTEGER", "Column in index file to take reference value. Default 1. Numeration is 1 based") do |item|
-		options[:from] = item.to_i - 1
+    	options[:from] = item.to_i - 1
 	end
 
-	options[:to] = 1
+	options[:to] = [1]
 	opts.on("-t", "--to INTEGER", "Column in index file to take the value that will be used in substitution. Default 2. Numeration is 1 based") do |item|
-		options[:to] = item.to_i - 1
+    	options[:to] = item.to_i - 1
 	end
 
 end.parse!

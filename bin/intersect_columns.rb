@@ -25,13 +25,13 @@ OptionParser.new do |opts|
   end
 
   options[:a_cols] = [0]
-  opts.on("-A", "--a_cols STRING", "Index of columns in base 0 to compare") do |item|
-    options[:a_cols] = item.split(',').map{|n| n.to_i}
+  opts.on("-A", "--a_cols STRING", "Index of columns in base 1 to compare") do |item|
+    options[:a_cols] = parse_column_indices(sep = ",", item)
   end
 
   options[:b_cols] = [0]
-  opts.on("-B", "--b_cols STRING", "Index of columns in base 0 to compare") do |item|
-    options[:b_cols] = item.split(',').map{|n| n.to_i}
+  opts.on("-B", "--b_cols STRING", "Index of columns in base 1 to compare") do |item|
+    options[:b_cols] = parse_column_indices(sep = ",", item)
   end
 
   options[:count] = false

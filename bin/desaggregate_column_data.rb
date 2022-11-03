@@ -20,8 +20,8 @@ OptionParser.new do |opts|
   end
 
   options[:col_index] = nil
-  opts.on("-x", "--column_index INTEGER", "Column index (0 based) to use as reference") do |item|
-    options[:col_index] = item.to_i
+  opts.on("-x", "--column_index INTEGER", "Column index (1 based) to use as reference") do |item|
+    options[:col_index] = item.to_i - 1
   end
 
   options[:sep] = ","

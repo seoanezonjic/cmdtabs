@@ -21,8 +21,8 @@ OptionParser.new do |opts|
   end
 
   options[:col_index] = nil
-  opts.on("-x", "--column_index INTEGER", "Column index (0 based) to use as reference") do |item|
-    options[:col_index] = item.to_i
+  opts.on("-x", "--column_index INTEGER", "Column index (1 based) to use as reference") do |item|
+    options[:col_index] = item.to_i - 1
   end
 
   options[:sep] = ','
@@ -31,8 +31,8 @@ OptionParser.new do |opts|
   end
 
   options[:col_aggregate] = nil
-  opts.on("-a", "--column_aggregate INTEGER", "Column index (0 based) to extract data and join for each id in column index") do |item|
-    options[:col_aggregate] = item.to_i
+  opts.on("-a", "--column_aggregate INTEGER", "Column index (1 based) to extract data and join for each id in column index") do |item|
+    options[:col_aggregate] = item.to_i - 1
   end
 
   opts.on_tail("-h", "--help", "Show this message") do
