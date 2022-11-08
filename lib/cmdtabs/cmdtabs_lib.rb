@@ -17,7 +17,7 @@ def load_several_files(all_files, sep = "\t", limit=0)
         		if FileTest.directory?(file)
                 	STDERR.puts "#{file} is not a valid file"
                 	next
-                end
+				end
                 loaded_files[file] = load_input_data(file, sep, limit)
         end
         return loaded_files
@@ -46,7 +46,7 @@ def write_output_data(output_data, output_path=nil, sep="\t")
 end
 
 # aggregate_column_data.rb
-def aggregate_column (input_table, col_index, col_agg, sep)
+def aggregate_column(input_table, col_index, col_agg, sep)
   aggregated_data = {}
   aggregated_data_arr = []
   input_table.each do |fields|
@@ -67,7 +67,7 @@ end
 
 
 # desaggregate_column_data.rb
-def desaggregate_column (input_table, col_index, sep)
+def desaggregate_column(input_table, col_index, sep)
   desaggregated_data = []
     
   input_table.each do |fields|
@@ -106,7 +106,7 @@ def index_metrics(input_data, attributes)
 	return metric_names, indexed_metrics
 end
 
-def create_table (indexed_metrics, samples_tag, attributes, metric_names)
+def create_table(indexed_metrics, samples_tag, attributes, metric_names)
 	allTags = attributes + metric_names
 	table_output = []
 	corrupted_records = []
@@ -143,7 +143,7 @@ end
 
 
 # merge_tabular.rb
-def load_files (files_path)
+def load_files(files_path)
 	files = {}
 	files_path.each do |file_name|
 		file = []
@@ -165,7 +165,7 @@ def load_files (files_path)
 end
 
 
-def merge_files (files)
+def merge_files(files)
 	parent_table = {}
 	parent_table_arr = []
 	table_length = 0
@@ -197,7 +197,7 @@ end
 
 
 # standard_name_replacer.rb
-def name_replaces (tabular_input, sep, cols_to_replace, indexed_file_index)
+def name_replaces(tabular_input, sep, cols_to_replace, indexed_file_index)
 	translated_fields = []
 	untranslated_fields = []
 	tabular_input.each do |fields|
@@ -306,7 +306,7 @@ def shift_by_array_indexes(arr_sub, indexes)
 end
 
 # table_linker.rb
-def link_table (indexed_linker, tabular_file, drop_line, sep)
+def link_table(indexed_linker, tabular_file, drop_line, sep)
 	linked_table = []
 	tabular_file.each do |fields|
 		id = fields.first
@@ -339,7 +339,7 @@ def tag_file(input_file, tags, header)
 	empty_header = Array.new(tags.length, "") if header
 	input_file.each_with_index do |fields, n_row|
 		if n_row == 0 && header
-			taged_file <<empty_header.dup.concat(fields)
+			taged_file << empty_header.dup.concat(fields)
 			next
 		end
 		taged_file << tags.dup.concat(fields)
@@ -348,7 +348,6 @@ def tag_file(input_file, tags, header)
 end
 
 
-# excel_to_tabular.rb
 def extract_data_from_sheet(sheet, columns2extract)
 	storage = []
 	sheet.each do |row|
