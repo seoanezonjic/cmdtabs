@@ -53,5 +53,5 @@ end.parse!
 
 x = Xsv.open(options[:input_file])
 sheet = x.sheets[options[:sheet_number]]
-storage = extract_data_from_sheet(sheet, options[:columns2extract])
+storage = extract_columns(sheet, options[:columns2extract])
 write_output_data(storage, options[:output_file])

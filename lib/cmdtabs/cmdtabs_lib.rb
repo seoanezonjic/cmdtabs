@@ -298,10 +298,7 @@ def filter_columns(input_table, options)
 end
 
 def shift_by_array_indexes(arr_sub, indexes)
-	subsetted_arr = []
-	indexes.each do |idx|
-    	subsetted_arr << arr_sub[idx]
-    end
+	subsetted_arr = indexes.map{ |idx| arr_sub[idx]}
     return subsetted_arr
 end
 
@@ -348,10 +345,10 @@ def tag_file(input_file, tags, header)
 end
 
 
-def extract_data_from_sheet(sheet, columns2extract)
+def extract_columns(table, columns2extract)
 	storage = []
-	sheet.each do |row|
-		storage << columns2extract.map{|colnum| row[colnum] } 
+	table.each do |row|
+		storage << shift_by_array_indexes(table, columns2extract)
 	end
 	return storage
 end
