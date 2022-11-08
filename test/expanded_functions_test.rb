@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'xsv'
 require File.join(File.dirname(__FILE__), 'test_helper.rb')
 
 class Tests < MiniTest::Test
@@ -26,6 +27,14 @@ class Tests < MiniTest::Test
 		match_test = expanded_match(string, pattern, "c")
 		expected_result = false
 		assert_equal expected_result, match_test
+	end
+
+	def test_extract_columns
+		x = Xsv.open(File.join(DATA_TEST_PATH, 'cluster_genes.xlsx'))
+		sheet = x.sheets[0]
+		test_result = extract_columns(sheet, [0, 2])
+		expected_result =[['HGNC:21197', '1039_ref'], ['HGNC:21143', '4705_ref']]
+		assert_equal expected_result, test_result
 	end
 
 end
