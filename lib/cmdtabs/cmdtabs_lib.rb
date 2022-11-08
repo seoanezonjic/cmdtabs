@@ -348,7 +348,7 @@ end
 def extract_columns(table, columns2extract)
 	storage = []
 	table.each do |row|
-		storage << shift_by_array_indexes(table, columns2extract)
+		storage << shift_by_array_indexes(row, columns2extract)
 	end
 	return storage
 end

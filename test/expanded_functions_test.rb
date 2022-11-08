@@ -31,7 +31,7 @@ class Tests < MiniTest::Test
 
 	def test_extract_columns
 		x = Xsv.open(File.join(DATA_TEST_PATH, 'cluster_genes.xlsx'))
-		sheet = x.sheets[0]
+		sheet = x.sheets[0].to_a
 		test_result = extract_columns(sheet, [0, 2])
 		expected_result =[['HGNC:21197', '1039_ref'], ['HGNC:21143', '4705_ref']]
 		assert_equal expected_result, test_result
