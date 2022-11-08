@@ -14,7 +14,7 @@ end
 def load_several_files(all_files, sep = "\t", limit=0)
         loaded_files = {}
         all_files.each do |file|
-        		if FileTest.directory?(file)
+				if FileTest.directory?(file)
                 	STDERR.puts "#{file} is not a valid file"
                 	next
 				end
@@ -221,17 +221,17 @@ def merge_and_filter_tables(input_files, options)
         filtered_table = []
         options[:cols_to_show] = (0..input_files.first[0].length - 1).to_a if options[:cols_to_show].nil?
         input_files.each do |filename, file|
-            if options[:header].nil?
-                if header.empty? 
+			if options[:header].nil?
+				if header.empty? 
                     header = file.shift
-                else
+				else
         	        file.shift
-        	    end 
-        	end
+				end 
+			end
         	filtered_table = filtered_table.concat(filter_columns(file, options)) 
         end	
         filtered_table = filtered_table.uniq if options[:uniq]
-        if !header.empty?
+		if !header.empty?
 	        header = shift_by_array_indexes(header, options[:cols_to_show])
 	        filtered_table.unshift(header)
 		end

@@ -33,7 +33,7 @@ class Tests < MiniTest::Test
 		assert_equal expected_result, tag_test
 	end
 
-		def test_load_records
+	def test_load_records
 		input_table = load_input_data(File.join(DATA_TEST_PATH, 'disease_cluster'))
 		records_test = load_records(input_table, [0], false)
 		expected_result = [['MONDO:0008995'], ['MONDO:0007172'], ['MONDO:0014823'], ['MONDO:0017999'], ['MONDO:0011142'],
