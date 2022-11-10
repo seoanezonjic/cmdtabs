@@ -123,10 +123,7 @@ class Tests < MiniTest::Test
 
 	def test_filter_columns
 		input_table = load_input_data(File.join(DATA_TEST_PATH, 'cluster_genes_dis_desagg'))
-		col_filter = [0]
-		keywords = "21197"
-		patterns = build_pattern(col_filter, patterns)
-		options = {:col_filter => col_filter, :keywords => keywords, :search_mode => "s", :match_mode => "i", :reverse => false, :cols_to_show => [0, 1]}
+		options = {:col_filter => [0], :keywords => "21197", :search_mode => "s", :match_mode => "i", :reverse => false, :cols_to_show => [0, 1]}
 		filter_columns_test = filter_columns(input_table, options)
 		expected_result = [["HGNC:21197", "483_ref"], ["HGNC:21197", "1039_ref"], ["HGNC:21197", "1071_ref"]]
 		assert_equal expected_result, filter_columns_test
