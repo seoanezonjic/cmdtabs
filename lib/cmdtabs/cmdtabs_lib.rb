@@ -320,7 +320,7 @@ end
 # tag_table.rb
 def load_and_parse_tags(tags, sep)
 	parsed_tags = []
-	tags.map do |tag| 
+	tags.each do |tag| 
 		if File.exist?(tag)
 			parsed_tags << load_input_data(tag, sep)
 			break

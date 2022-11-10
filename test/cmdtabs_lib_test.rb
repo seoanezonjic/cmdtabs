@@ -21,9 +21,8 @@ class Tests < MiniTest::Test
 
 	def test_create_table
 		metric_file = load_input_data(File.join(DATA_TEST_PATH, 'all_metrics'))
-		fixCols = 'sample'
-		attributes = fixCols.split(',')
-		samples_tag = attributes.shift
+		attributes = []
+		samples_tag = 'sample'
 		metric_names, indexed_metrics = index_metrics(metric_file, attributes)
 		create_table_test = create_table(indexed_metrics, samples_tag, attributes, metric_names)
 		expected_result = [[["sample", "initial_total_sequences", "initial_read_max_length", "initial_read_min_length", "initial_%gc"], 
