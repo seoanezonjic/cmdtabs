@@ -73,8 +73,8 @@ def desaggregate_column(input_table, col_index, sep)
   input_table.each do |fields|
     aggregated_fields = fields[col_index]
     aggregated_fields.split(sep).each do |field|
-      record = fields[0..(col_index - 1)] + [field] + fields[(col_index + 1)..fields.length]
-      #record = fields[0..(options[:col_index] + 1)] + [field] + fields[(options[:col_index] + 1)..fields.length]
+      record = fields.clone
+      record[col_index] = field
       desaggregated_data << record
     end
   end
