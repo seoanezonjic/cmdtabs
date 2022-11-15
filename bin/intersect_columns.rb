@@ -75,19 +75,20 @@ if options[:count]
 	puts "c: #{common.length}"
 else
 	if options[:keep] == 'c'
-    common = common.map{|r| full_a_rec[r] + full_b_rec[r]} if options[:full]
-		write_output_data(common, nil, options[:sep])
+    result = common
+    result = common.map{|r| full_a_rec[r] + full_b_rec[r]} if options[:full]
 	elsif options[:keep] == 'a'
-    a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
-		write_output_data(a_only, nil, options[:sep])
+    result = a_only
+    result = a_only.map{|r| full_a_rec[r]} if options[:full]
 	elsif options[:keep] == 'b'
-    b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
-		write_output_data(b_only, nil, options[:sep])
+    result = b_only
+    result = b_only.map{|r| full_a_rec[r]} if options[:full]
 	elsif options[:keep] == 'ab'
     if options[:full]
-      a_only = a_only.map{|r| full_a_rec[r]} if options[:full]
-      b_only = b_only.map{|r| full_a_rec[r]} if options[:full]
+      a_only = a_only.map{|r| full_a_rec[r]}
+      b_only = b_only.map{|r| full_a_rec[r]}
     end
-		write_output_data(a_only + b_only, nil, options[:sep])
+    result = a_only + b_only
 	end
+	write_output_data(result, nil, options[:sep])
 end

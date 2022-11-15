@@ -40,12 +40,12 @@ OptionParser.new do |opts|
     	options[:columns] = parse_column_indices(sep = ",", item)
 	end
 
-	options[:from] = [0]
+	options[:from] = 0
 	opts.on("-f", "--from INTEGER", "Column in index file to take reference value. Default 1. Numeration is 1 based") do |item|
     	options[:from] = item.to_i - 1
 	end
 
-	options[:to] = [1]
+	options[:to] = 1
 	opts.on("-t", "--to INTEGER", "Column in index file to take the value that will be used in substitution. Default 2. Numeration is 1 based") do |item|
     	options[:to] = item.to_i - 1
 	end
@@ -62,7 +62,6 @@ indexed_index = index_array(input_index, options[:from], options[:to])
 
 input_table = load_input_data(options[:input_file], options[:input_separator])
 
-tabular_output_translated, tabular_output_untraslated = name_replaces(input_table, options[:input_separator], options[:columns], indexed_index)
+tabular_output_translated, _ = name_replaces(input_table, options[:input_separator], options[:columns], indexed_index)
 
 write_output_data(tabular_output_translated, options[:output_file], options[:input_separator])
-write_output_data(tabular_output_untraslated, options[:output_file], options[:input_separator])
