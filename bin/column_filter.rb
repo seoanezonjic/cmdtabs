@@ -59,7 +59,7 @@ optparse = OptionParser.new do |opts|
                 options[:uniq] = true
         end
 
-        options[:header] = nil
+        options[:header] = false
         opts.on( '-H', '--header', 'indicate if files have header' ) do 
                 options[:header] = true
         end

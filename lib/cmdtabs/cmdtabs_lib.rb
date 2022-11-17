@@ -197,7 +197,7 @@ end
 
 
 # standard_name_replacer.rb
-def name_replaces(tabular_input, sep, cols_to_replace, translation_index, keep_untranslated=false)
+def name_replaces(tabular_input, sep, cols_to_replace, translation_index, remove_untranslated=false)
 	translated_fields = []
 	untranslated_fields = []
 	tabular_input.each do |fields|
@@ -206,7 +206,7 @@ def name_replaces(tabular_input, sep, cols_to_replace, translation_index, keep_u
 			if !replaced_field.nil? 
 				fields[col] = replaced_field 
 				translated_fields << fields
-			elsif keep_untranslated
+			elsif !remove_untranslated
 				translated_fields << fields
 			else
 				untranslated_fields << fields
@@ -223,7 +223,7 @@ def merge_and_filter_tables(input_files, options)
         filtered_table = []
         options[:cols_to_show] = (0..input_files.first[0].length - 1).to_a if options[:cols_to_show].nil?
         input_files.each do |filename, file|
-			if !options[:header].nil?
+			if options[:header]
 				if header.empty? 
                     header = file.shift
 				else
