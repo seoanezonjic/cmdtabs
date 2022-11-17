@@ -167,7 +167,6 @@ end
 
 def merge_files(files)
 	parent_table = {}
-	parent_table_arr = []
 	table_length = 0
 	files.each do |file_names, file|
 		local_length = 0
@@ -183,14 +182,14 @@ def merge_files(files)
 			parent_table[id].concat(fields)
 			
 		end
-		table_length += local_length
-		
-		parent_table.each do |id, fields|
-			diference = table_length - fields.length
-			fields.concat(Array.new(diference,'-')) if diference > 0
-			parent_table_arr << [id, fields]
-		end
-			
+		table_length += local_length			
+	end
+	parent_table_arr = []
+	parent_table.each do |id, fields|
+		diference = table_length - fields.length
+		fields.concat(Array.new(diference,'-')) if diference > 0
+		fields.unshift(id)
+		parent_table_arr << fields
 	end
 	return parent_table_arr
 end
