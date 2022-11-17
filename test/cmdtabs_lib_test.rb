@@ -76,8 +76,7 @@ class Tests < MiniTest::Test
 		input_table = load_input_data(File.join(DATA_TEST_PATH, 'cluster_genes_dis_agg'))
 		tags = load_and_parse_tags([File.join(DATA_TEST_PATH, 'tracker')], "\t")
 		taged_test = tag_file(input_table, tags, true)
-		expected_result = [['', '', '', '', '', 'HGNC:21197', '483_ref,1039_ref,1071_ref'], 
-			['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm', 'HGNC:21143', '211_ref,4705_ref']]
+		expected_result = [['MERGED_net_no_raw_cpm', 'MERGED', 'no', 'no', 'cpm', 'HGNC:21143', '211_ref,4705_ref']]
 		assert_equal expected_result, taged_test
 	end
 
