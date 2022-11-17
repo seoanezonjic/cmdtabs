@@ -20,7 +20,7 @@ OptionParser.new do |opts|
 
   options[:columns2extract] = [0]
   opts.on("-c", "--columns2extract INTEGER", "Column position to extract (1 based). Default 1") do |data|
-    options[:columns2extract] = parse_column_indices(sep = ",", item)
+    options[:columns2extract] = parse_column_indices(sep = ",", data)
   end
 
   options[:input_file] = nil

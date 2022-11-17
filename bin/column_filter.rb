@@ -35,7 +35,7 @@ optparse = OptionParser.new do |opts|
         end
 
         options[:search_mode] = 'c'
-        opts.on( '-s', '--search STRING', 'c a match per column, s some match in some column. Default c' ) do |search_mode|
+        opts.on( '-s', '--search STRING', 'c for match in every columns set, s some match in some column. Default c' ) do |search_mode|
                 options[:search_mode] = search_mode
         end
 
@@ -59,8 +59,13 @@ optparse = OptionParser.new do |opts|
                 options[:uniq] = true
         end
 
+        options[:header] = nil
+        opts.on( '-H', '--header', 'indicate if files have header' ) do 
+                options[:header] = true
+        end
+
         # Set a banner, displayed at the top of the help screen.
-        opts.banner = "Usage: table_header.rb -t tabulated_file \n\n"
+        opts.banner = "Usage: column_filter.rb -t tabulated_file \n\n"
 
         # This displays the help screen
         opts.on( '-h', '--help', 'Display this screen' ) do

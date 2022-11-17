@@ -50,6 +50,10 @@ OptionParser.new do |opts|
     	options[:to] = item.to_i - 1
 	end
 
+	options[:keep_untranslated] = false
+	opts.on("-u", "--keep_untranslated", "Activate this flag for outputting the untranslated entries") do 
+		options[:keep_untranslated] = true
+	end
 end.parse!
 
 
@@ -58,10 +62,10 @@ end.parse!
 ##################################################################################################
 
 input_index = load_input_data(options[:index_file])
-indexed_index = index_array(input_index, options[:from], options[:to])
+translation_index = index_array(input_index, options[:from], options[:to])
 
 input_table = load_input_data(options[:input_file], options[:input_separator])
 
-tabular_output_translated, _ = name_replaces(input_table, options[:input_separator], options[:columns], indexed_index)
+tabular_output_translated, _ = name_replaces(input_table, options[:input_separator], options[:columns], translation_index, options[:keep_untranslated])
 
 write_output_data(tabular_output_translated, options[:output_file], options[:input_separator])

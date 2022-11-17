@@ -197,16 +197,16 @@ end
 
 
 # standard_name_replacer.rb
-def name_replaces(tabular_input, sep, cols_to_replace, indexed_file_index, remove_uns=false)
+def name_replaces(tabular_input, sep, cols_to_replace, translation_index, keep_untranslated=false)
 	translated_fields = []
 	untranslated_fields = []
 	tabular_input.each do |fields|
 		cols_to_replace.each do |col|
-			replaced_field = indexed_file_index[fields[col]]
+			replaced_field = translation_index[fields[col]]
 			if !replaced_field.nil? 
 				fields[col] = replaced_field 
 				translated_fields << fields
-			elsif !remove_uns
+			elsif keep_untranslated
 				translated_fields << fields
 			else
 				untranslated_fields << fields
@@ -223,7 +223,7 @@ def merge_and_filter_tables(input_files, options)
         filtered_table = []
         options[:cols_to_show] = (0..input_files.first[0].length - 1).to_a if options[:cols_to_show].nil?
         input_files.each do |filename, file|
-			if options[:header].nil?
+			if !options[:header].nil?
 				if header.empty? 
                     header = file.shift
 				else
@@ -335,12 +335,8 @@ end
 
 def tag_file(input_file, tags, header)
 	taged_file = []
-	empty_header = Array.new(tags.length, "") if header
 	input_file.each_with_index do |fields, n_row|
-		if n_row == 0 && header
-			taged_file << empty_header.dup.concat(fields)
-			next
-		end
+		next if n_row == 0 && header
 		taged_file << tags.dup.concat(fields)
 	end
 	return taged_file

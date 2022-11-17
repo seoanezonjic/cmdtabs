@@ -28,13 +28,11 @@ optparse = OptionParser.new do |opts|
         end        
 
         options[:header] = false
-        opts.on( '-H', '--header', 'Indicate if input file has a header line' ) do 
+        opts.on( '-H', '--header', 'Indicate if input file has a header line. Header will not be printed in output' ) do 
                 options[:header] =  true
         end  
 
-      
-
- 		opts.on( '-h', '--help', 'Display this screen' ) do
+	opts.on( '-h', '--help', 'Display this screen' ) do
                 puts opts
                 exit
         end
