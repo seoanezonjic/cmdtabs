@@ -18,7 +18,7 @@ cat $test_data/cluster_genes_dis_agg| aggregate_column_data.rb -i '-' -x 2 -s ",
 create_metric_table.rb $test_data/all_metrics sample $out/metric_table -c TEST_file
 
 #merge_tabular --------------------------------------------------------------------------
-merge_tabular.rb $test_data/disease_gene $test_data/disease_cluster > $out/merge_disease_cluster_gene
+merge_tabular.rb $test_data/disease_gene $test_data/disease_cluster_uniq > $out/merge_disease_cluster_gene
 
 #tag_table --------------------------------------------------------------------------
 tag_table.rb -i $test_data/cluster_stats -t $test_data/tracker 1> $out/tag_table
