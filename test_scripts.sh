@@ -4,6 +4,7 @@ source ~soft_bio_267/initializes/init_ruby
 export PATH=`pwd`/bin:$PATH
 test_data=test/data_tests/
 out=output_test_scripts 
+data_to_test=data_test_scripts
 mkdir $out
 
 #aggregate_column_data --------------------------------------------------------------------------
@@ -80,3 +81,8 @@ column_filter.rb  -t "$test_data/disease*" -c 1 -f 1 -k "MONDO" -s "c" -m "i" > 
 column_filter.rb  -t "$test_data/disease*" -c 1 -f 1 -k "MONDO" -s "c" -m "i" -u > $out/column_matching_soft_1_column_uniq 
 #test column matching soft 1 column reverse
 column_filter.rb  -t "$test_data/disease*" -c 1 -f 1 -k "17" -s "c" -m "i" -r > $out/column_matching_soft_1_column_reverse
+
+for file_to_test in `ls $out`; do
+	echo $file_to_test
+	diff $out/$file_to_test $data_to_test/$file_to_test"_to_test"
+done
