@@ -137,5 +137,19 @@ class Tests < MiniTest::Test
 		["MONDO:0013969", "1189_ref"], ["MONDO:0008995", "HGNC:16873"], ["MONDO:0017999", "HGNC:21197"], ["MONDO:0013969", "HGNC:21176"]]
 		assert_equal expected_result, test_result
 	end
+
+	def test_load_files
+		loaded_files_ref = {File.join(DATA_TEST_PATH, "disease_gene")=>[["MONDO:0010193", "HGNC:3527"], ["MONDO:0008995", "HGNC:16873"], ["MONDO:0012866", "HGNC:21197"], ["MONDO:0017999", "HGNC:21197"], ["MONDO:0011142", "HGNC:21144"], ["MONDO:0013969", "HGNC:21176"], ["MONDO:0018053", "HGNC:21157"]], 
+		 File.join(DATA_TEST_PATH, "disease_cluster_uniq")=>[["MONDO:0008995", "19_ref"], ["MONDO:0007172", "22_ref"], ["MONDO:0014823", "25_ref"], ["MONDO:0017999", "53_ref"], ["MONDO:0009833", "53_ref"], ["MONDO:0009594", "54_ref"], ["MONDO:0010193", "54_ref"], ["MONDO:0012176", "62_ref"], ["MONDO:0011142", "66_ref"], ["MONDO:0013969", "1189_ref"]]}
+		loaded_files_to_test =load_files([File.join(DATA_TEST_PATH, "disease_gene"), File.join(DATA_TEST_PATH, "disease_cluster_uniq")])
+		assert_equal loaded_files_ref, loaded_files_to_test
+	end
+
+	def test_merge_files
+		merged_ref_file = [["MONDO:0010193", "HGNC:3527", "54_ref"], ["MONDO:0008995", "HGNC:16873", "19_ref"], ["MONDO:0012866", "HGNC:21197", "-"], ["MONDO:0017999", "HGNC:21197", "53_ref"], ["MONDO:0011142", "HGNC:21144", "66_ref"], ["MONDO:0013969", "HGNC:21176", "1189_ref"], ["MONDO:0018053", "HGNC:21157", "-"], ["MONDO:0007172", "-", "22_ref"], ["MONDO:0014823", "-", "25_ref"], ["MONDO:0009833", "-", "53_ref"], ["MONDO:0009594", "-", "54_ref"], ["MONDO:0012176", "-", "62_ref"]]
+		loaded_files_to_test =load_files([File.join(DATA_TEST_PATH, "disease_gene"), File.join(DATA_TEST_PATH, "disease_cluster_uniq")])
+		merged_files_to_test = merge_files(loaded_files_to_test)
+		assert_equal merged_ref_file, merged_files_to_test
+	end
 end
 
