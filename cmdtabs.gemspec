@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["seoanezonjic"]
   spec.email         = ["seoanezonjic@hotmail.com"]
 
-  spec.summary       = "Gem to manipulate text tables in cmd"
+  spec.summary       = "DEPRECATED PROJECT. MIGRATED TO PYTHON: https://github.com/seoanezonjic/py_cmdtabs\nGem to manipulate text tables in cmd"
   spec.description   = "Toolset to merge, colapse tables rename field contents, etc "
   spec.homepage      = "https://github.com/seoanezonjic/cmdtabs"
   spec.license       = "MIT"
